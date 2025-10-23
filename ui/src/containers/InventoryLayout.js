@@ -2,6 +2,7 @@ import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
+import InventoryFormModal from '../components/InventoryFormModal2'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
 import moment from 'moment'
@@ -12,7 +13,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableRow from '@material-ui/core/TableRow'
 import { EnhancedTableHead, EnhancedTableToolbar, getComparator, stableSort } from '../components/Table'
-import React, { useEffect } from 'react'
+import React, { useCallback , useEffect} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
@@ -47,9 +48,12 @@ const InventoryLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const inventory = useSelector(state => state.inventory.all)
+  const products = useSelector(state => state.products.all)
+  const unitOfMeasurements = useSelector(state => state.inventory.um)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
   useEffect(() => {
     if (!isFetched) {
+      dispatch(inventoryDuck.findInventory())
       dispatch(inventoryDuck.findInventory())
       dispatch(productDuck.findProducts())
     }
@@ -59,6 +63,7 @@ const InventoryLayout = (props) => {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('calories')
   const [selected, setSelected] = React.useState([])
+  const saveInventory = useCallback(inventory => { dispatch(inventoryDuck.saveInventory(inventory)) }, [dispatch])
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -95,10 +100,53 @@ const InventoryLayout = (props) => {
 
   const isSelected = (id) => selected.indexOf(id) !== -1
 
+  const [isDeleteOpen, setDeleteOpen] = React.useState(false)
+  const [isInvModalOpen, setInvModalOpen] = React.useState(false)
+  const [title, setTitle] = React.useState('')
+  const [formName, setFormName] = React.useState('')
+  const [initValues, setInitValues] = React.useState({})
+
+  const toggleCreate = () => {
+    setTitle('Create')
+    setFormName('inventoryCreate')
+    setInitValues({
+      Id: null,
+      Name: '',
+      Version: 1,
+      ProductType: '',
+      Description: '',
+      AveragePrice: 0,
+      Amount: 0,
+      UnitOfMeasurement: '',
+      BestBeforeDate: moment().format(),
+      NeverExpires: false
+    })
+    setInvModalOpen(true)
+  }
+
+  function getInvObj(selected, attr) {
+    for (let inv = 0; inv < inventory.length; inv++) {
+      if (inventory[inv].id === selected[0]) {
+        return inventory[inv][attr]
+      }
+    }
+  }
+
+  const toggleModals = (resetSelected) => {
+    setInvModalOpen(false)
+    setDeleteOpen(false)
+    if (resetSelected) {
+      setSelected([])
+    }
+  }
+
   return (
     <Grid container>
       <Grid item xs={12}>
-        <EnhancedTableToolbar numSelected={selected.length} title='Inventory'/>
+        <EnhancedTableToolbar numSelected={selected.length}
+          title='Inventory'
+          toggleCreate={toggleCreate}
+        />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
             <EnhancedTableHead
@@ -140,6 +188,16 @@ const InventoryLayout = (props) => {
             </TableBody>
           </Table>
         </TableContainer>
+        <InventoryFormModal
+          title={title}
+          formName={formName}
+          isDialogOpen={isInvModalOpen}
+          handleDialog={toggleModals}
+          productList={products}
+          unitOfMeasList={unitOfMeasurements}
+          handleInventory={saveInventory}
+          initialValues={initValues}
+        />
       </Grid>
     </Grid>
   )

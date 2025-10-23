@@ -117,7 +117,7 @@ const InventoryLayout = (props) => {
       Description: '',
       AveragePrice: 0,
       Amount: 0,
-      UnitOfMeasurement: '',
+      UnitOfMeasurement: 'oz',
       BestBeforeDate: moment().format(),
       NeverExpires: false
     })

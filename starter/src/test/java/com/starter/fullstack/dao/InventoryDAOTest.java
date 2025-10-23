@@ -1,6 +1,7 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.annotation.Resource;
 import org.junit.After;
@@ -56,20 +57,21 @@ public class InventoryDAOTest {
     /**
      * Test Create method.
      */
-//    @Test
-//    public void create() {
-//      Inventory inventoryOne = new Inventory();
-//      inventoryOne.setName(NAME);
-//      inventoryOne.setProductType(PRODUCT_TYPE);
-//      Inventory inventoryTwo = new Inventory();
-//      inventoryTwo.setName(NAME);
-//      inventoryTwo.setProductType(PRODUCT_TYPE);
-//      this.inventoryDAO.create(inventoryOne);
-//      this.inventoryDAO.create(inventoryTwo);
-//      List<Inventory> actualInventory = this.inventoryDAO.findAll();
-//      // Asserting equal to one because in this case it would increment the amount
-//      Assert.assertEquals(1, actualInventory.size());
-//      var firstItem = actualInventory.get(0);
-//      Assert.assertEquals(2.0, firstItem.getAmount());
-//    }
+  @Test
+  public void create() {
+    Inventory inventoryOne = new Inventory();
+    inventoryOne.setName(NAME);
+    inventoryOne.setProductType(PRODUCT_TYPE);
+    inventoryOne.setAmount(BigDecimal.ONE);
+    Inventory inventoryTwo = new Inventory();
+    inventoryTwo.setName(NAME);
+    inventoryTwo.setProductType(PRODUCT_TYPE);
+    this.inventoryDAO.create(inventoryOne);
+    this.inventoryDAO.create(inventoryTwo);
+    List<Inventory> actualInventory = this.inventoryDAO.findAll();
+    // Asserting equal to one because in this case it would increment the amount
+    Assert.assertEquals(2, actualInventory.size());
+    var firstItem = actualInventory.get(0);
+    Assert.assertEquals(BigDecimal.ONE, firstItem.getAmount());
+  }
 }

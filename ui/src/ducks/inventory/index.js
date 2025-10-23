@@ -30,7 +30,21 @@ export const findInventory = createAction(actions.INVENTORY_GET_ALL, () =>
 
 export const saveInventory = createAction(actions.INVENTORY_SAVE, (inventory) =>
   (dispatch, getState, config) => axios
-    .post(`${config.restAPIUrl}/inventory`, inventory)
+    .post(`${config.restAPIUrl}/inventory`,
+      {
+        id: null,
+        //version: 1,
+        name: 'testcreate1',
+        productType: 'test',
+        description: 'word',
+        averagePrice: 12.00,
+        amount: 0.80,
+        unitOfMeasurement: 2,
+        bestBeforeDate: null,
+        neverExpires: true,
+        availableStores: ['Walmart']
+      }
+    )
     .then((suc) => {
       const invs = []
       getState().inventory.all.forEach(inv => {

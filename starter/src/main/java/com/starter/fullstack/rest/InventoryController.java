@@ -38,6 +38,7 @@ public class InventoryController {
    * @param inventory inventory.
    * @return Inventory.
    */
+
   @PostMapping
   public Inventory createInventory(@Valid @RequestBody Inventory inventory) {
     return this.inventoryDAO.create(inventory);

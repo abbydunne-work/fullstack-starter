@@ -82,7 +82,12 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    // TODO
-    return Optional.empty();
+    Inventory inventoryRecordToDelete = this.mongoTemplate.findById(id, Inventory.class);
+    if (inventoryRecordToDelete != null) {
+      this.mongoTemplate.remove(inventoryRecordToDelete);
+      return Optional.of(inventoryRecordToDelete);
+    } else {
+      return Optional.empty();
+    }
   }
 }

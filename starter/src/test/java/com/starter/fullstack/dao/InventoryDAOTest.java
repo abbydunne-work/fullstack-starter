@@ -52,4 +52,19 @@ public class InventoryDAOTest {
     List<Inventory> actualInventory = this.inventoryDAO.findAll();
     Assert.assertFalse(actualInventory.isEmpty());
   }
+
+  /**
+   * Test Delete by Id method.
+   */
+  @Test
+  public void delete() {
+    Inventory inventory = new Inventory();
+    inventory.setName(NAME);
+    inventory.setProductType(PRODUCT_TYPE);
+    this.mongoTemplate.save(inventory);
+    var deletedInventory = this.inventoryDAO.delete(inventory.getId());
+    Assert.assertTrue(deletedInventory.isPresent());
+    List<Inventory> actualInventory = this.inventoryDAO.findAll();
+    Assert.assertTrue(actualInventory.isEmpty());
+  }
 }

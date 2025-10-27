@@ -1,8 +1,8 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Assert;
@@ -59,19 +59,45 @@ public class InventoryDAOTest {
      */
   @Test
   public void create() {
+    List<Inventory> actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(0, actualInventory.size());
     Inventory inventoryOne = new Inventory();
     inventoryOne.setName(NAME);
     inventoryOne.setProductType(PRODUCT_TYPE);
-    inventoryOne.setAmount(BigDecimal.ONE);
+    var result = this.inventoryDAO.create(inventoryOne);
+    Assert.assertNotNull(result);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(1, actualInventory.size());
+
+    result.setName("UPDATE");
+    result = this.inventoryDAO.create(result);
+    Assert.assertNotNull(result);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(1, actualInventory.size());
+    var newName = actualInventory.get(0).getName();
+    Assert.assertEquals("UPDATE", newName);
+
+  }
+
+  /**
+   * Test Delete by Ids method.
+   */
+  @Test
+  public void delete() {
+    Inventory inventoryOne = new Inventory();
     Inventory inventoryTwo = new Inventory();
+    inventoryOne.setName(NAME);
+    inventoryOne.setProductType(PRODUCT_TYPE);
     inventoryTwo.setName(NAME);
     inventoryTwo.setProductType(PRODUCT_TYPE);
-    this.inventoryDAO.create(inventoryOne);
-    this.inventoryDAO.create(inventoryTwo);
+    this.mongoTemplate.save(inventoryOne);
+    this.mongoTemplate.save(inventoryTwo);
     List<Inventory> actualInventory = this.inventoryDAO.findAll();
-    // Asserting equal to one because in this case it would increment the amount
     Assert.assertEquals(2, actualInventory.size());
-    var firstItem = actualInventory.get(0);
-    Assert.assertEquals(BigDecimal.ONE, firstItem.getAmount());
+    List<String> idsToDelete = actualInventory.stream().map(Inventory::getId).collect(Collectors.toList());
+    this.inventoryDAO.delete(idsToDelete);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(0, actualInventory.size());
+
   }
 }

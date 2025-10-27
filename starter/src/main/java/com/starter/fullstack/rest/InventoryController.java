@@ -43,5 +43,15 @@ public class InventoryController {
   public Inventory createInventory(@Valid @RequestBody Inventory inventory) {
     return this.inventoryDAO.create(inventory);
   }
+
+  /**
+  * Delete Inventory By Ids.
+  * @param ids ids.
+  */
+  @DeleteMapping
+  public void deleteInventoryById(@RequestBody List<String> ids) {
+    Assert.notEmpty(ids, "Inventory Ids were not provided");
+    this.inventoryDAO.delete(ids);
+  }
 }
 

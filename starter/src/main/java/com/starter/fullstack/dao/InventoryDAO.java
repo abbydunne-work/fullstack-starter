@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
 
 /**
@@ -51,8 +53,7 @@ public class InventoryDAO {
    * @return Created/Updated Inventory.
    */
   public Inventory create(Inventory inventory) {
-    // TODO
-    return null;
+    return this.mongoTemplate.save(inventory);
   }
 
   /**
@@ -78,11 +79,10 @@ public class InventoryDAO {
 
   /**
    * Delete Inventory By Id.
-   * @param id Id of Inventory.
-   * @return Deleted Inventory.
+   * @param ids Ids of Inventory.
    */
-  public Optional<Inventory> delete(String id) {
-    // TODO
-    return Optional.empty();
+  public void delete(List<String> ids) {
+    Query query = Query.query(Criteria.where("_id").in(ids));
+    this.mongoTemplate.remove(query, Inventory.class);
   }
 }

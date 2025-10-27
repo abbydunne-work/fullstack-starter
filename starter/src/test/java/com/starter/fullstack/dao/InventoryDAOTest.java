@@ -2,6 +2,7 @@ package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,5 +52,52 @@ public class InventoryDAOTest {
     this.mongoTemplate.save(inventory);
     List<Inventory> actualInventory = this.inventoryDAO.findAll();
     Assert.assertFalse(actualInventory.isEmpty());
+  }
+
+    /**
+     * Test Create method.
+     */
+  @Test
+  public void create() {
+    List<Inventory> actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(0, actualInventory.size());
+    Inventory inventoryOne = new Inventory();
+    inventoryOne.setName(NAME);
+    inventoryOne.setProductType(PRODUCT_TYPE);
+    var result = this.inventoryDAO.create(inventoryOne);
+    Assert.assertNotNull(result);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(1, actualInventory.size());
+
+    result.setName("UPDATE");
+    result = this.inventoryDAO.create(result);
+    Assert.assertNotNull(result);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(1, actualInventory.size());
+    var newName = actualInventory.get(0).getName();
+    Assert.assertEquals("UPDATE", newName);
+
+  }
+
+  /**
+   * Test Delete by Ids method.
+   */
+  @Test
+  public void delete() {
+    Inventory inventoryOne = new Inventory();
+    Inventory inventoryTwo = new Inventory();
+    inventoryOne.setName(NAME);
+    inventoryOne.setProductType(PRODUCT_TYPE);
+    inventoryTwo.setName(NAME);
+    inventoryTwo.setProductType(PRODUCT_TYPE);
+    this.mongoTemplate.save(inventoryOne);
+    this.mongoTemplate.save(inventoryTwo);
+    List<Inventory> actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(2, actualInventory.size());
+    List<String> idsToDelete = actualInventory.stream().map(Inventory::getId).collect(Collectors.toList());
+    this.inventoryDAO.delete(idsToDelete);
+    actualInventory = this.inventoryDAO.findAll();
+    Assert.assertEquals(0, actualInventory.size());
+
   }
 }
